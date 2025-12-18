@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/expense.dart';
+import 'package:intl/intl.dart';
 
 class ExpenseForm extends StatefulWidget {
   const ExpenseForm({super.key});
@@ -12,7 +13,7 @@ class _ExpenseFormState extends State<ExpenseForm> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   Category _selectedCategory = Category.leisure;
-  DateTime _selectedDate = DateTime.now();
+  DateTime? _selectedDate;
 
   @override
   void dispose() {
@@ -41,9 +42,9 @@ class _ExpenseFormState extends State<ExpenseForm> {
     String title = _titleController.text;
     double? amount = double.tryParse(_amountController.text); // amount
     Category category = _selectedCategory; // done for icons
-    DateTime date = _selectedDate;
+    DateTime? date = _selectedDate;
     if (title.isEmpty || amount == null || amount <= 0) {
-      // Show an error dialog if inputs are invalid
+      
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -67,16 +68,16 @@ class _ExpenseFormState extends State<ExpenseForm> {
     Expense newExpense = Expense(
       title: title,
       amount: amount,
-      date: date,
+      date: date!,
       category: category,
     );
 
-    // TODO YOUR CODE HERE pop to the parent done!
+    // pop to the parent done!
     Navigator.pop(context, newExpense);
   }
 
   void onCancel() {
-    // Close the modal
+    
     Navigator.pop(context);
   }
 
@@ -99,11 +100,13 @@ class _ExpenseFormState extends State<ExpenseForm> {
               TextField(
                 controller: _amountController,
                 decoration: const InputDecoration(labelText: "Amount"),
-                keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 10),
 
-              Text("No date selected"),
+            _selectedDate == null ? Text(
+                "No Date Selected"
+            ) : Text("Date: ${DateFormat.yMMMd().format(_selectedDate!)}"),
+              
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton(
