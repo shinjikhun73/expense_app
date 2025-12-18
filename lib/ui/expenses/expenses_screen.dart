@@ -57,28 +57,50 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         backgroundColor: Colors.blue[700],
         title: const Text('Ronan-The-Best Expenses App'),
       ),
-      body: ListView.builder(
-        itemCount: _expenses.length,
-        itemBuilder: (context, index) {
-          final expense = _expenses[index];
-          // Using dimisissible to delete items
-          return Dismissible(
-            key: ValueKey(expense.id),
-            direction: DismissDirection.endToStart,
-            background: Container(
-              color: Colors.red,
-              alignment: Alignment.centerRight,
-              child: const Icon(Icons.delete, color: Colors.white),
+      body: _expenses.isEmpty
+          ? Center(
+              child: Text(
+                'No expense yet',
+                style: TextStyle(fontSize: 18, color: Colors.black),
+              ),
+            )
+          : ListView.builder(
+              itemCount: _expenses.length,
+              itemBuilder: (context, index) {
+                final expense = _expenses[index];
+                // Using dimisissible to delete items
+                return Dismissible(
+                  key: ValueKey(expense.id),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    child: const Icon(Icons.delete, color: Colors.white),
+                  ),
+                  onDismissed: (direction) {
+                    setState(() {
+                      _expenses.removeAt(index);
+                    });
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('${expense.title} deleted'),
+                        action: SnackBarAction(
+                          label: 'UNDO',
+                          onPressed: () {
+                            setState(() {
+                              _expenses.insert(index, expense);
+                            });
+                          },
+                        ),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  child: ExpenseItem(expense: expense),
+                );
+              },
             ),
-            onDismissed: (direction) {
-              setState(() {
-                _expenses.removeAt(index);
-              });
-            },
-            child: ExpenseItem(expense: expense),
-          );
-        },
-      ),
     );
   }
 }
